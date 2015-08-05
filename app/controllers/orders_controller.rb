@@ -16,8 +16,7 @@ class OrdersController < ApplicationController
   end
 
   def change_status
-    @order.status = params[:status]
-    @order.save
+    @order.update_attributes(status: params[:status])
     redirect_to "/admin"
   end
 
