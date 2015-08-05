@@ -1,4 +1,6 @@
 class OrdersController < ApplicationController
+  before_filter :find_order, only: [:show, :edit, :update, :destroy, :change_status]
+
   def index
     @orders = Order.all
     authorize! :manage, Order
@@ -7,7 +9,6 @@ class OrdersController < ApplicationController
   end
 
   def show
-    @order = Order.find(params[:id])
     authorize! :manage, Order
 
     render :show
@@ -15,9 +16,8 @@ class OrdersController < ApplicationController
   end
 
   def change_status
-    order = Order.find(params[:id])
-    order.status = params[:status]
-    order.save
+    @order.status = params[:status]
+    @order.save
     redirect_to "/admin"
   end
 
@@ -34,7 +34,6 @@ class OrdersController < ApplicationController
   end
 
   def edit
-    @order = Order.find(params[:id])
     authorize! :update, Order
   end
 
@@ -58,7 +57,6 @@ class OrdersController < ApplicationController
   end
 
   def update
-    @order = Order.find(params[:id])
 
     if @order.update_attributes(params[:order])
       redirect_to @order, notice: 'Order was successfully updated.'
@@ -68,9 +66,14 @@ class OrdersController < ApplicationController
   end
 
   def destroy
-    @order = Order.find(params[:id])
     @order.destroy
 
     redirect_to orders_url
+  end
+
+  private
+
+  def find_order
+    @order = Order.find(params[:id])
   end
 end

@@ -1,4 +1,6 @@
 class LineItemsController < ApplicationController
+  before_filter :load_line_item, only: [:destroy, :increase, :decrease]
+
   def create
     @cart = current_cart
     product = Product.find(params[:product_id])
@@ -13,14 +15,12 @@ class LineItemsController < ApplicationController
   end
 
   def destroy
-    @line_item = LineItem.find(params[:id])
     @line_item.destroy
 
     redirect_to @line_item.cart
   end
 
   def increase
-    @line_item = LineItem.find(params[:id])
     if @line_item
       @line_item.update_attribute("quantity", @line_item.increase_quantity)
       redirect_to @line_item.cart, notice: 'Product quantity has been updated.'
@@ -28,7 +28,6 @@ class LineItemsController < ApplicationController
   end
 
   def decrease
-    @line_item = LineItem.find(params[:id])
     if @line_item
       if @line_item.quantity <= 1
         @line_item.delete
@@ -40,5 +39,11 @@ class LineItemsController < ApplicationController
                     notice: 'Product quantity has been updated.'
       end
     end
+  end
+
+  private
+
+  def load_line_item
+    @line_item = LineItem.find(params[:id])
   end
 end
